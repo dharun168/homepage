@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI C Program Demo — Perceptron</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#667eea;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box}
+    body{font-family:Inter,Segoe UI,system-ui,Arial;background:linear-gradient(180deg,#071029 0%, #071b2a 100%);color:#e6eef8;margin:0;padding:40px}
+    .container{max-width:1100px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{font-weight:700;font-size:1.4rem;background:linear-gradient(90deg,var(--accent),#764ba2);-webkit-background-clip:text;color:transparent}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:24px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 6px 30px rgba(2,6,23,0.6);margin-top:24px}
+    h1{font-size:1.6rem;margin:0 0 6px}
+    p.lead{color:var(--muted);margin:0 0 18px}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    pre{background:var(--card);padding:16px;border-radius:8px;overflow:auto;color:#dbeafe;line-height:1.5;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;font-size:13px;border:1px solid rgba(255,255,255,0.03)}
+    .meta{color:var(--muted);font-size:13px;margin-bottom:12px}
+    a.btn{display:inline-block;padding:10px 14px;border-radius:8px;background:var(--accent);color:white;text-decoration:none;font-weight:600;margin-top:8px}
+    .info{font-size:14px;color:var(--muted)}
+    footer{margin-top:28px;color:var(--muted);font-size:13px;text-align:center}
+    @media(max-width:900px){.grid{grid-template-columns:1fr;}.container{padding:0 16px}}  
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">Perceptron.C Demo</div>
+      <nav class="meta">C • AI • Beginner friendly</nav>
+    </header>
+
+    <div class="card">
+      <h1>Simple AI in C — Perceptron</h1>
+      <p class="lead">This demo provides a compact C program that trains a single-layer perceptron to learn the AND logic gate. Download the source, compile with <code>gcc</code>, and run locally.</p>
+
+      <div class="grid">
+        <div>
+          <div class="meta">Source code (preview)</div>
+          <pre>// ai_perceptron.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Activation: step function
+int activate(double x) {
+  return x >= 0.0 ? 1 : 0;
+}
+
+int main(void) {
+  // Training data for AND gate
+  double X[4][2] = {{0,0},{0,1},{1,0},{1,1}};
+  int Y[4] = {0,0,0,1};
+
+  double w0 = 0.0, w1 = 0.0, b = 0.0; // weights and bias
+  double lr = 0.1; // learning rate
+  int epochs = 50;
+
+  srand((unsigned)time(NULL));
+  // small random init
+  w0 = (rand()/(double)RAND_MAX - 0.5);
+  w1 = (rand()/(double)RAND_MAX - 0.5);
+  b  = (rand()/(double)RAND_MAX - 0.5);
+
+  for (int e = 0; e < epochs; ++e) {
+    int total_err = 0;
+    for (int i = 0; i < 4; ++i) {
+      double x0 = X[i][0];
+      double x1 = X[i][1];
+      double z = w0*x0 + w1*x1 + b;
+      int yhat = activate(z);
+      int err = Y[i] - yhat;
+      if (err != 0) {
+        w0 += lr * err * x0;
+        w1 += lr * err * x1;
+        b  += lr * err;
+      }
+      total_err += abs(err);
+    }
+    // print progress every 10 epochs
+    if (e % 10 == 0) printf("epoch %d  error=%d\n", e, total_err);
+    if (total_err == 0) break;
+  }
+
+  printf("\nTrained weights:\n  w0=%.4f\n  w1=%.4f\n  b=%.4f\n\n", w0, w1, b);
+  printf("Predictions:\n");
+  for (int i = 0; i < 4; ++i) {
+    double x0 = X[i][0];
+    double x1 = X[i][1];
+    int yhat = activate(w0*x0 + w1*x1 + b);
+    printf("[%g, %g] -> %d\n", x0, x1, yhat);
+  }
+  return 0;
+}
+</pre>
+
+          <div class="meta">Compile & run</div>
+          <div class="info">
+            Open a terminal in this folder and run:
+            <pre style="background:transparent;border:none;padding:0;color:#a8d0ff">gcc ai_perceptron.c -o ai_perceptron
+./ai_perceptron</pre>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card" style="padding:16px">
+            <div class="meta">Download</div>
+            <a class="btn" href="ai_perceptron.c" download>Download C source</a>
+            <div style="height:12px"></div>
+            <div class="meta">What it does</div>
+            <p class="info">This program trains a single perceptron with a step activation to classify the AND truth table. It's a compact example of supervised learning implemented in plain C.</p>
+            <div style="height:12px"></div>
+            <div class="meta">Next steps</div>
+            <ul class="info">
+              <li>Modify learning rate or epochs</li>
+              <li>Extend to multi-layer network (requires backprop)</li>
+              <li>Visualize training losses</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <footer>
+      <p>Files created: <strong>ai_demo.html</strong>, <strong>ai_perceptron.c</strong></p>
+    </footer>
+  </div>
+</body>
+</html>
